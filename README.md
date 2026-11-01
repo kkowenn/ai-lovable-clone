@@ -1,120 +1,80 @@
-# Lovable AI – Full-Stack AI Sandbox App
+# Lovable AI
 
-An AI-powered full-stack app built with **Next.js**, **Prisma**, **Inngest**, **E2B**, and a custom Python agent using **LangChain**. Users can generate sandboxed code/data, preview results, and interact with autonomous AI agents.
+An AI-powered app builder. Describe what you want, and an autonomous Python agent generates code, runs it in an isolated sandbox, and returns a live preview.
 
-## 🧱 Built With
+## demo 
 
-- **Next.js 15** (App Router)
-- **Prisma** + Neon PostgreSQL
-- **Inngest CLI** (Event-driven orchestration)
-- **E2B Sandboxes** (Code execution)
-- **LangChain (Python)** + FastAPI
-- **TailwindCSS** + Shadcn UI
+[Watch the demo](https://kritsadakruapat.vercel.app/)
 
-## Services Used
-
-| Service     | Use                                  |
-|-------------|---------------------------------------|
-| **Neon**    | Cloud PostgreSQL DB                   |
-| **Inngest** | Serverless orchestration + background jobs |
-| **E2B**     | Secure sandboxed code execution       |
-| **FastAPI** | Python REST API wrapping LangChain agent |
-
-Testing api database server:
-
-https://sandbox-api-production.up.railway.app/api/save-data
-
-
-## Project Structure
+## Architecture
 
 ```
-/src → App logic (Next.js + tRPC + Inngest)
-/prisma/schema.prisma → Database models (Prisma)
-/Agent-Python/ → Python LangChain agent (FastAPI)
-/docker-compose.yml → Full-stack dev environment
-/dev.sh → Local dev bootstrap script
+Next.js app ──► Inngest (background jobs) ──► FastAPI service ──► LangChain agent
+     │                                                                  │
+     └──────────────► Neon PostgreSQL (Prisma)          E2B sandbox ◄───┘
 ```
 
-## Build With
+| Component | Role |
+|-----------|------|
+| **Next.js 15** (App Router, tRPC) | Web UI and API |
+| **Inngest** | Event-driven orchestration and background jobs |
+| **FastAPI + LangChain** | Python service that runs the autonomous agent |
+| **E2B** | Secure sandboxed code execution |
+| **Prisma + Neon** | Database access and managed PostgreSQL |
+| **Tailwind CSS + shadcn/ui** | Styling and components |
 
-* Next.js 15 App Router
-* Prisma + Neon DB
-* Inngest CLI
-* E2B sandbox
-* Tailwind + Shadcn UI
+## Quick Start
 
+**Prerequisites:** Node.js 20+, Python 3.11+, Docker, and accounts for Neon, OpenAI and E2B.
 
-# Quick Start
-
-Main app:
-
-http://localhost:3000
-
-Log ai agent process:
-
-http://localhost:8288/runs
-
-python ai agent process server:
-
-http://localhost:8000/docs
-
-## 1 create new .env or .env.docker, copy and paste this (Paste content in link, NOT paste this link ( ͠° ͟ʖ ͡° )) if cannot open the link, sorry you don't have authorization ( •̀ᴗ•́ )
-
-https://docs.google.com/document/d/1nJDqi5JiPEhNa0Rxi7StyZ4ZfFpSAV-1ZIiFReG75DU/edit?tab=t.0
-
-
-## or using your own .env example:
+**1. Configure environment variables.** Create `.env` (local) or `.env.docker` (Docker):
 
 ```env
-DATABASE_URL="postgresql://<user>:<pass>@<neon-host>/<db>?sslmode=require"
-OPENAI_API_KEY="sk-..."
-E2B_API_KEY="e2b_..."
+DATABASE_URL="postgresql://<user>:<password>@<neon-host>/<db>?sslmode=require"
+OPENAI_API_KEY="<your-openai-key>"
+E2B_API_KEY="<your-e2b-key>"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
-### Option 1: Local Dev
+**2. Run the project.**
 
 ```bash
-chmod +x dev.sh
-./dev.sh
+# Option A: local development
+chmod +x dev.sh && ./dev.sh
+
+# Option B: Docker
+docker compose --env-file .env.docker up --build
 ```
 
-test python server:
+| Service | URL |
+|---------|-----|
+| Web app | http://localhost:3000 |
+| Inngest dashboard | http://localhost:8288/runs |
+| Agent API docs | http://localhost:8000/docs |
+
+**3. Verify the agent service.**
+
 ```bash
 curl -X POST http://localhost:8000/run-task \
   -H "Content-Type: application/json" \
   -d '{"task": "Summarize recent transcript files."}'
 ```
 
-Starts Prisma, Inngest Dev Server, and the app.
+## Project Structure
 
-### Option 2: Docker
-
-http://localhost:8000/docs#/default/run_task_run_task_post
-
-```bash
-docker compose --env-file .env.docker up --build
 ```
-Runs the app and tools inside a Docker container.
-
---- 
-debug เฉยๆ
-
-
-```bash
-🧠 Inngest DeepsearchAgentFunction
-    |
-    |-> ⛓️ runPythonAgent(prompt: string)
-            |
-            |-> 🌐 POST to FastAPI /run-task
-                    |
-                    |-> 🐍 AgenticAI.run_autonomous_task()
+src/                  Next.js app, tRPC and Inngest functions
+prisma/               Database schema
+Agent-Python/         FastAPI + LangChain agent
+sandbox-templates/    E2B sandbox templates
+docker-compose.yml    Full-stack development environment
+dev.sh                Local bootstrap script
 ```
 
-for python ai agent:
-```bash
-docker build -t agentic-ai .
+## Security
 
-docker run -p 8000:8000 agentic-ai
-```
+Never commit real API keys or `.env` files. Share only placeholder values like the example above.
 
+## License
+
+Add a license here (for example, MIT).
