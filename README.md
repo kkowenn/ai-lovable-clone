@@ -71,10 +71,3 @@ docker-compose.yml    Full-stack development environment
 dev.sh                Local bootstrap script
 ```
 
-## Security
-
-Never commit real API keys or `.env` files. Share only placeholder values like the example above.
-
-## License
-
-Add a license here (for example, MIT).
